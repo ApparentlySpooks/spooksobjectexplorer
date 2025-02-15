@@ -10,4 +10,5 @@ discord.gg/getspooksploit | discord server (for my executor)
 
 - Have a magnificant Day!
 - spooks
+
 ![image](https://github.com/user-attachments/assets/2e59b8a4-8a68-443b-b0ea-4b64a2282728)
