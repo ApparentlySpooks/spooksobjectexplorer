@@ -1,0 +1,112 @@
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "SpooksExplorerUI"
+screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
+-- Create the scrolling frame for the list
+local scrollingFrame = Instance.new("ScrollingFrame")
+scrollingFrame.Size = UDim2.new(0, 300, 0, 400)
+scrollingFrame.Position = UDim2.new(0, 10, 0, 10)
+scrollingFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+scrollingFrame.ScrollBarThickness = 12
+scrollingFrame.Parent = screenGui
+
+-- Create the UIListLayout for the scrolling frame
+local uiListLayout = Instance.new("UIListLayout")
+uiListLayout.Parent = scrollingFrame
+uiListLayout.Padding = UDim.new(0, 5)
+uiListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+
+-- TextLabel for version info below the list
+local versionLabel = Instance.new("TextLabel")
+versionLabel.Size = UDim2.new(0, 300, 0, 30)
+versionLabel.Position = UDim2.new(0, 10, 0, 420)
+versionLabel.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+versionLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+versionLabel.TextSize = 14
+versionLabel.Text = "Spooks Object Explorer 1.0.1"
+versionLabel.Parent = screenGui
+
+-- Function to create an icon for a part or model
+local function createIcon(object)
+    local icon = Instance.new("ImageLabel")
+    icon.Size = UDim2.new(0, 20, 0, 20)
+    icon.Position = UDim2.new(0, 5, 0, 0)
+    
+    if object:IsA("Part") then
+        icon.Image = "rbxassetid://507771012"  -- Example Part Icon
+    elseif object:IsA("Model") then
+        icon.Image = "rbxassetid://507771017"  -- Example Model Icon
+    else
+        icon.Image = "rbxassetid://507771014"  -- Default Icon for other object types
+    end
+    
+    icon.BackgroundTransparency = 1
+    icon.Parent = scrollingFrame
+    return icon
+end
+
+-- Function to create a dropdown button for parts/models
+local function createDropdownButton(parentFrame, object, childList)
+    local button = Instance.new("TextButton")
+    button.Size = UDim2.new(0, 200, 0, 30)
+    button.Position = UDim2.new(0, 30, 0, 0)
+    button.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+    button.TextColor3 = Color3.fromRGB(255, 255, 255)
+    button.TextSize = 14
+    button.Text = (object.Name .. " (Click to Toggle)")
+    button.Parent = parentFrame
+
+    -- Create a frame to hold child objects
+    local childFrame = Instance.new("Frame")
+    childFrame.Size = UDim2.new(1, 0, 0, 0)
+    childFrame.Position = UDim2.new(0, 0, 0, 30)
+    childFrame.BackgroundTransparency = 1
+    childFrame.Parent = parentFrame
+
+    -- Function to toggle visibility of children
+    local function toggleChildren()
+        for _, child in pairs(childList) do
+            child.Visible = not child.Visible
+        end
+    end
+
+    -- Connect button click to toggle children visibility
+    button.MouseButton1Click:Connect(toggleChildren)
+end
+
+-- Function to list objects in the workspace
+local function listObjects()
+    -- Loop through all objects in the Workspace
+    for _, object in pairs(workspace:GetDescendants()) do
+        local frame = Instance.new("Frame")
+        frame.Size = UDim2.new(1, 0, 0, 30)
+        frame.BackgroundTransparency = 1
+        frame.Parent = scrollingFrame
+
+        -- Create an icon for the object
+        local icon = createIcon(object)
+        icon.Parent = frame
+
+        -- Create a text label for the object name
+        local textLabel = Instance.new("TextLabel")
+        textLabel.Size = UDim2.new(1, -40, 1, 0)  -- Space for the icon
+        textLabel.Position = UDim2.new(0, 30, 0, 0)
+        textLabel.BackgroundTransparency = 1
+        textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+        textLabel.TextSize = 14
+        textLabel.Text = object.Name
+        textLabel.TextXAlignment = Enum.TextXAlignment.Left
+        textLabel.TextWrapped = true
+        textLabel.Parent = frame
+
+        -- If the object is a Model or a Part with children, create a dropdown button
+        if object:IsA("Model") and #object:GetChildren() > 0 then
+            createDropdownButton(frame, object, object:GetChildren())
+        elseif object:IsA("Part") and #object:GetChildren() > 0 then
+            createDropdownButton(frame, object, object:GetChildren())
+        end
+    end
+end
+
+-- Call the function to list objects when the script runs
+listObjects()
